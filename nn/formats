@@ -1,0 +1,4 @@
+.vec is used to save vector representation models
+.nn - neural net trained model
+.py - source code
+Cross-validation results stored in cv_data.txt
