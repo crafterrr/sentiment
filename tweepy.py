@@ -97,7 +97,8 @@ class TwitterClient(object):
                 else:
                     tweets.append(parsed_tweet)
 
-            # returns parsed tweets as a list of dictionaries for each word
+            # returns parsed tweets as a list of dictionaries for each tweet
+            # ex {'text'=['Путин', 'войдёт', 'историю'], 'created_at': datetime.datetime(2017, 4, 23, 13, 14, 29), 'favorite_count': 0, 'retweet_count': 7}
             return tweets
 
         except tweepy.TweepError as e:
@@ -110,6 +111,7 @@ def get_data(query, count=100, params=['text'], tweet_lang='ru'):
     api = TwitterClient()
     # calling function to get tweets
     tweets = api.get_tweets(query=query, count=count, params=params, tweets_lang=tweets_lang)
-    # returns parsed tweets as a list of dictionaries for each word
+    # returns parsed tweets as a list of dictionaries for each tweet
+    # ex {'text'=['Путин', 'войдёт', 'историю'], 'created_at': datetime.datetime(2017, 4, 23, 13, 14, 29), 'favorite_count': 0, 'retweet_count': 7}
     return tweets
 
