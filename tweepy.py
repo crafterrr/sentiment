@@ -105,7 +105,7 @@ class TwitterClient(object):
             print("Error : " + str(e))
 
 # getting tweets to anylize (query-key word, count=quantity, params-list of params to return)
-def get_data(query, count, params, tweet_lang='ru'):
+def get_data(query, count=100, params=['text'], tweet_lang='ru'):
     # creating object of TwitterClient Class
     api = TwitterClient()
     # calling function to get tweets
