@@ -1,4 +1,4 @@
-            # return parsed tweets as a list of dictionariesimport re
+import re
 import tweepy
 from tweepy import OAuthHandler
 from nltk.corpus import stopwords
