@@ -1,4 +1,4 @@
-import re
+            # return parsed tweets as a list of dictionariesimport re
 import tweepy
 from tweepy import OAuthHandler
 from nltk.corpus import stopwords
@@ -97,7 +97,7 @@ class TwitterClient(object):
                 else:
                     tweets.append(parsed_tweet)
 
-            # return parsed tweets
+            # returns parsed tweets as a list of dictionaries for each word
             return tweets
 
         except tweepy.TweepError as e:
@@ -110,5 +110,6 @@ def get_data(query, count, params, tweet_lang='ru'):
     api = TwitterClient()
     # calling function to get tweets
     tweets = api.get_tweets(query=query, count=count, params=params, tweets_lang=tweets_lang)
+    # returns parsed tweets as a list of dictionaries for each word
     return tweets
 
