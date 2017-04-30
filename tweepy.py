@@ -60,7 +60,7 @@ class TwitterClient(object):
             tokens = [token if emoticon_re.search(token) else token.lower() for token in tokens]
         return tokens
 
-    def get_tweets(self, tweets_lang, query, count, params): #query - ключевое слово, count - кол-во сообщений, params - необходимые поля
+    def get_tweets(self, tweets_lang, query, count, params): #query - key word, count - number of tweets, params - necessary fields
         '''
         Main function to fetch tweets and parse them.
         '''
@@ -126,10 +126,11 @@ class TwitterClient(object):
 
 
         # return parsed tweets
+        # ex {'text'=['Путин', 'войдёт', 'историю'], 'created_at': datetime.datetime(2017, 4, 23, 13, 14, 29), 'favorite_count': 0, 'retweet_count': 7}
         return tweets
 
 
-
+# getting tweets to anylize (query-key word, count=quantity, params-list of params to return)
 def get_data(query, count=100, params=['text'], tweet_lang='ru'):
     # creating object of TwitterClient Class
     api = TwitterClient()
