@@ -14,10 +14,10 @@ class TwitterClient(object):
         Class constructor or initialization method.
         '''
         # keys and tokens from the Twitter Dev Console
-        consumer_key = 
-        consumer_secret = 
-        access_token = 
-        access_token_secret = 
+        consumer_key = ''
+        consumer_secret = ''
+        access_token = ''
+        access_token_secret = ''
 
         # attempt authentication
         try:
@@ -60,52 +60,76 @@ class TwitterClient(object):
             tokens = [token if emoticon_re.search(token) else token.lower() for token in tokens]
         return tokens
 
-    def get_tweets(self, tweets_lang, query, count, params): #query - key word, count - number of tweets, params - necessary fields
+    def get_tweets(self, tweets_lang, query, count, params): #query - ключевое слово, count - кол-во сообщений, params - необходимые поля
         '''
         Main function to fetch tweets and parse them.
         '''
         punctuation = list(string.punctuation)
-        stop = stopwords.words('russian') + punctuation + ['rt', 'via']
+        stop = stopwords.words('russian') + punctuation + ['rt', 'via']+ ['«', '»']
         # empty list to store parsed tweets
         tweets = []
+        sinceID = None
+        tweetCount = 0
+        max_id = -1
 
-        try:
-            # call twitter api to fetch tweets
-            fetched_tweets = self.api.search(q=query, count=count, lang=tweets_lang)
 
-            # parsing tweets one by one
-            for tweet in fetched_tweets:
-                # empty dictionary to store required params of a tweet
-                parsed_tweet = {}
-                if 'text' in params:
-                    # saving text of tweet
-                    #parsed_tweet['text'] = self.preprocess(tweet.text, lowercase=False)
-                    parsed_tweet['text'] = [term for term in self.preprocess(tweet.text, lowercase=False) if term not in stop]
-                if 'created_at' in params:
-                    parsed_tweet['created_at'] = tweet.created_at
-                if 'retweet_count' in params:
-                    parsed_tweet['retweet_count'] = tweet.retweet_count
-                if 'favorite_count' in params:
-                    parsed_tweet['favorite_count'] = tweet.favorite_count
-                parsed_tweet['user'] = tweet.user.id_str
-
-                # appending parsed tweet to tweets list
-                if tweet.retweet_count > 0:
-                    # if tweet has retweets, ensure that it is appended only once
-                    if parsed_tweet not in tweets:
-                        tweets.append(parsed_tweet)
+        while tweetCount < count:
+            try:
+                if max_id <= 0:
+                    if not sinceID:
+                        fetched_tweets = self.api.search(q=query, count=count, lang=tweets_lang)
+                    else:
+                        fetched_tweets = self.api.search(q=query, count=count, lang=tweets_lang, since_id=sinceID)
                 else:
+                    if not sinceID:
+                        fetched_tweets = self.api.search(q=query, count=count, lang=tweets_lang, max_id=str(max_id-1))
+                    else:
+                        fetched_tweets = self.api.search(q=query, count=count, lang=tweets_lang, since_id=sinceID, max_id=str(max_id-1))
+                if not fetched_tweets:
+                    print('No more tweets found')
+                    break
+
+                # parsing tweets one by one
+                for tweet in fetched_tweets:
+                    # empty dictionary to store required params of a tweet
+                    parsed_tweet = {}
+                    if 'text' in params:
+                        # saving text of tweet
+                        # parsed_tweet['text'] = self.preprocess(tweet.text, lowercase=False)
+                        parsed_tweet['text'] = [term for term in self.preprocess(tweet.text, lowercase=False) if
+                                                term not in stop]
+                    if 'created_at' in params:
+                        parsed_tweet['created_at'] = tweet.created_at
+                    if 'retweet_count' in params:
+                        parsed_tweet['retweet_count'] = tweet.retweet_count
+                    if 'favorite_count' in params:
+                        parsed_tweet['favorite_count'] = tweet.favorite_count
+                    parsed_tweet['user'] = tweet.user.id_str
+
+                    # appending parsed tweet to tweets list
+                    '''if tweet.retweet_count > 0:
+                        # if tweet has retweets, ensure that it is appended only once
+                        if parsed_tweet not in tweets:
+                            tweets.append(parsed_tweet)
+                    else:
+                        tweets.append(parsed_tweet)'''
                     tweets.append(parsed_tweet)
+                tweetCount += len(fetched_tweets)
+                max_id = fetched_tweets[-1].id
 
-            # returns parsed tweets as a list of dictionaries for each tweet
-            # ex {'text'=['Путин', 'войдёт', 'историю'], 'created_at': datetime.datetime(2017, 4, 23, 13, 14, 29), 'favorite_count': 0, 'retweet_count': 7}
-            return tweets
 
-        except tweepy.TweepError as e:
-            # print error (if any)
-            print("Error : " + str(e))
 
-# getting tweets to anylize (query-key word, count=quantity, params-list of params to return)
+            except tweepy.TweepError as e:
+                # exit if any error
+                print("some error: " + str(e))
+                break
+
+
+        # return parsed tweets
+        return tweets
+
+
+
 def get_data(query, count=100, params=['text'], tweet_lang='ru'):
     # creating object of TwitterClient Class
     api = TwitterClient()
